@@ -2,14 +2,20 @@
 
 using namespace std;
 
-int main(void)
+struct Store
 {
-    char infix[20];
-    char stack[20];
+    char value;
+    Store *next;
+};
 
-    infix[0] = '2';
-    infix[1] = '*';
-    infix[2] = '3';
-    infix[3] = '+';
-    infix[4] = '4';
+class Infix
+{
+    Store first = malloc(Store);
+
+public:
+    Infix();
+};
+Infix::Infix()
+{
+    first = NULL;
 }
