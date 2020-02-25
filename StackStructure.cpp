@@ -20,27 +20,49 @@ public:
     char pop();
     void addInfix(char);
     void print();
+    int createPostfix(Stack *, Stack *, Stack *);
 };
+
 void captureInfix(Stack *infix)
 {
     char val;
-    bool exit = false;
     do
     {
-        cout<<"Enter expression character: ";
+        cout<<"Enter character: ";
         cin>>val;
         infix->addInfix(val);
-        if (val == '=')
-            exit = true;
-    }while(!exit);
+    }while(val != '=');
+}
+int Stack::createPostfix(Stack *infix, Stack *stack_, Stack *output)
+{
+    Link *current = infix->top;
+    if (current == NULL)
+    {
+        cout<<"List is empty";
+        return 1;
+    }else
+    {
+        output = new Stack();
+        while(current->value != '=')
+        {
+            char val = current->value;
+            if (isdigit(val))
+            {
+                cout<<val<<" ";
+            }
+            current = current->next;
+        }
+        return 0;
+    }
 }
 int main(void)
 {
-    Stack *_stack, *infix, *postfix = new Stack();
-    //there is a logical error in line 55 -69 cant find it
+    Stack *infix = new Stack();
+    Stack *stack_ = new Stack();
+    Stack *output;
 
-    return 0;
-
+    captureInfix(infix);
+    stack_->createPostfix(infix, stack_, output);
 }
 
 Stack::Stack()
@@ -56,15 +78,23 @@ void Stack::addInfix(char val)
     Link *current;
     current = top;
 
-    if (current == NULL)
+    if (newNode == NULL)
     {
-        current  = newNode;
-    }else{
-        while(current->next != NULL)
+        //memory not created exit program
+        cout<<"Unable to store value"<<endl;
+    }else
+    {
+        if (current == NULL)
         {
-            current = current->next;
+            top = newNode;
+        }else
+        {
+            while(current->next != NULL)
+            {
+                current = current->next;
+            }
+            current->next = newNode;
         }
-        current->next = newNode;
     }
 }
 void Stack::push(char val)
