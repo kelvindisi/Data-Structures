@@ -18,9 +18,10 @@ public:
     Stack();
     void push(char);
     char pop();
-    void addInfix(char);
+    void enqueue(char);
     void print();
     int createPostfix(Stack *, Stack *, Stack *);
+    int addByPriority(char, Stack *);
 };
 
 void captureInfix(Stack *infix)
@@ -30,8 +31,62 @@ void captureInfix(Stack *infix)
     {
         cout<<"Enter character: ";
         cin>>val;
-        infix->addInfix(val);
+        infix->enqueue(val);
     }while(val != '=');
+}
+int Stack::addByPriority(char oper, Stack *output)
+{
+    char _oper;
+    switch(oper)
+    {
+    case '(':
+        push(oper);
+        break;
+    case '*':
+        push(oper);
+        break;
+    case ')':
+        _oper = top->value;
+        if (_oper == '*' || _oper == '+' || _oper == '/' || _oper == '-')
+        {
+            output->enqueue(_oper);
+            pop();
+            if (top->value == '(')
+                pop();
+            else
+                return 1;
+        }else if (_oper == '(')
+        {
+            pop();
+        }
+        break;
+    case '+':
+        _oper = top->value;
+        if (_oper == '*')
+        {
+            output->enqueue(_oper);
+            pop();
+            push(oper);
+        }
+        break;
+    case '-':
+        _oper = top->value;
+        if (_oper == '*')
+        {
+            output->enqueue(_oper);
+            pop();
+            _oper = top->value;
+        }
+        if (_oper == '+')
+        {
+            output->enqueue(_oper);
+            pop();
+            _oper = top->value;
+        }
+        output->enqueue(oper);
+        break;
+    }
+    return 0;
 }
 int Stack::createPostfix(Stack *infix, Stack *stack_, Stack *output)
 {
@@ -42,13 +97,25 @@ int Stack::createPostfix(Stack *infix, Stack *stack_, Stack *output)
         return 1;
     }else
     {
-        output = new Stack();
         while(current->value != '=')
         {
             char val = current->value;
             if (isdigit(val))
             {
-                cout<<val<<" ";
+                output->enqueue(val);
+            }else //value is not a digit
+            {
+                if (top == NULL) //no other operator in stack push
+                {
+                    push(val);
+                }else
+                {
+                    //shortening this function
+                    if (addByPriority(val, output)) //return zero if no problem
+                    {
+                        cout<<"There is an error with your expression"<<endl;
+                    }
+                }
             }
             current = current->next;
         }
@@ -59,17 +126,21 @@ int main(void)
 {
     Stack *infix = new Stack();
     Stack *stack_ = new Stack();
-    Stack *output;
+    Stack *output = new Stack();
+    //unchecked memory error that may occur
 
     captureInfix(infix);
     stack_->createPostfix(infix, stack_, output);
+
+    cout<<"postfix expression"<<endl;
+    output->print();
 }
 
 Stack::Stack()
 {
     top = NULL;
 }
-void Stack::addInfix(char val)
+void Stack::enqueue(char val)
 {
     Link *newNode = new Link();
     newNode->value = val;
