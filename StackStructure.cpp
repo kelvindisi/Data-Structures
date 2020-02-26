@@ -45,6 +45,15 @@ int Stack::addByPriority(char oper, Stack *output)
     case '*':
         push(oper);
         break;
+    case '/':
+        _oper = top->value;
+        if (_oper == '*')
+        {
+            output->enqueue(_oper);
+            pop();
+            push(oper);
+        }
+        break;
     case ')':
         _oper = top->value;
         if (_oper == '*' || _oper == '+' || _oper == '/' || _oper == '-')
@@ -62,26 +71,25 @@ int Stack::addByPriority(char oper, Stack *output)
         break;
     case '+':
         _oper = top->value;
-        if (_oper == '*')
+        if (_oper == '*' || _oper == '/')
         {
             output->enqueue(_oper);
             pop();
+            push(oper);
+        }else
+        {
             push(oper);
         }
         break;
     case '-':
         _oper = top->value;
-        if (_oper == '*')
+        if (_oper == '*' || _oper == '/' || _oper == '+')
         {
             output->enqueue(_oper);
             pop();
-            _oper = top->value;
-        }
-        if (_oper == '+')
+        }else
         {
-            output->enqueue(_oper);
-            pop();
-            _oper = top->value;
+            push(oper);
         }
         output->enqueue(oper);
         break;
@@ -111,6 +119,7 @@ int Stack::createPostfix(Stack *infix, Stack *stack_, Stack *output)
                 }else
                 {
                     //shortening this function
+
                     if (addByPriority(val, output)) //return zero if no problem
                     {
                         cout<<"There is an error with your expression"<<endl;
@@ -118,6 +127,15 @@ int Stack::createPostfix(Stack *infix, Stack *stack_, Stack *output)
                 }
             }
             current = current->next;
+        } // end while loop
+        // check for signs remaining in stack and display
+        char oper;
+        while (top != NULL)
+        {
+            oper = top->value;
+            if (oper != '(')
+                output->enqueue(oper);
+            pop();
         }
         return 0;
     }
